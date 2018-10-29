@@ -1,5 +1,6 @@
 import numpy as np
 
+from mdp import GridMDP
 import view 
 
 if __name__ == '__main__':
@@ -32,10 +33,12 @@ if __name__ == '__main__':
     
     # Grid positions that ends the game
     terminalPos = np.zeros_like(rewardTable, dtype=np.bool)
-    terminalPos[goal1] = True
-    terminalPos[goal2] = True
-    terminalPos[monster1] = True
-    terminalPos[monster2] = True
+    goldPos = np.zeros_like(rewardTable, dtype=np.bool)
+    monsterPos = np.zeros_like(rewardTable, dtype=np.bool)
+    terminalPos[goal1] = goldPos[goal1] = True
+    terminalPos[goal2] = goldPos[goal2] = True
+    terminalPos[monster1] = monsterPos[monster1] = True
+    terminalPos[monster2] = monsterPos[monster2] = True
 
     # Action probabilities
     actionProbabilities=[
@@ -43,4 +46,11 @@ if __name__ == '__main__':
                           (1, 0.4), # Robot slips to Right!
                         ]
 
-    
+    grid = GridMDP(rewardTable, terminalPos, actionProbabilities)
+
+    print('Result of Value Iteration:')
+    policy, utilityTable = grid.valueIteration(0.5, 25)
+    print(policy)
+    print(utilityTable)
+    view.plotHeatmap(utilityTable)
+    view.plotPolicy(policy, goldPos, monsterPos)
